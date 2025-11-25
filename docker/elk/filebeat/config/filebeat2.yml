@@ -1,0 +1,74 @@
+# ============================== Filebeat Configuration ==============================
+name: filebeat
+
+# ============================== Filebeat Inputs ==============================
+filebeat.inputs:
+  - type: log
+    paths:
+      - "/var/log/filebeat/service/*.log"
+      - "/app/*.log"
+    json.message_key: msg
+    json.add_error_key: true
+    start_position: beginning
+    scan_frequency: 1s
+    tail_files: true
+    ignore_older: 168h
+    close_inactive: 1h
+    clean_inactive: 192h
+
+# ============================== Filebeat Modules ==============================
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+
+# ============================== Setup ==============================
+setup.template.name: "logs-service"
+setup.template.pattern: "logs-service-*"
+setup.kibana.host: "kibana:5601"
+setup.template.settings:
+  index.number_of_shards: 1
+
+# ============================== Processors ==============================
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  # Decodifica JSON adicional si necesitas campos extra
+  # - decode_json_fields:
+  #     fields: ["msg"]
+  #     target: ""
+  #     overwrite_keys: true
+  #     add_error_key: true
+
+# ============================== Shutdown ==============================
+filebeat.shutdown_timeout: 10s
+
+# ============================== Output ==============================
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  username: filebeat_internal
+  password: ${FILEBEAT_INTERNAL_PASSWORD}
+  index: "logs-service-%{+yyyy.MM.dd}"
+  # Evita duplicados en la escritura
+  bulk_max_size: 2048
+
+# ============================== Fields under root ==============================
+fields_under_root: true
+fields:
+  host.ip: 127.0.0.1
+
+# ============================== Logging ==============================
+logging.level: debug
+logging.to_files: false
+logging.to_syslog: false
+# ============================== Persistencia del registry ==============================
+# Evita duplicados al reiniciar contenedor
+# Montar volumen en Docker Compose:
+# volumes:
+#   - ./filebeat-data:/usr/share/filebeat/data
+
+# ============================== Tips ==============================
+# 1. Usa `json.message_key: msg` para logs de Zap.
+# 2. `scan_frequency: 1s` permite detectar archivos nuevos rápidamente.
+# 3. Mantener el `data/registry` persistente evita reenvío de logs antiguos.
+# 4. Multiline solo es necesario si tus logs tienen stacktraces en varias líneas.
