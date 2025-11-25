@@ -48,6 +48,8 @@ func Set[T any](c *redis.Client, key string, value T, duration time.Duration) er
 	if err != nil {
 		return err
 	}
+
+	// fmt.Println(key, string(v))
 	return c.Set(key, v, duration).Err()
 }
 

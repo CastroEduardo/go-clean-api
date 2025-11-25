@@ -47,11 +47,16 @@ func (u *OtpUsecase) SetOtp(mobileNumber string, otp string) error {
 	}
 
 	res, err := cache.Get[otpDto](u.redisClient, key)
+
+	fmt.Println("Setting OTP:", otp)
 	if err == nil && !res.Used {
+		fmt.Println("OTP already exists and not used")
 		return &service_errors.ServiceError{EndUserMessage: service_errors.OptExists}
 	} else if err == nil && res.Used {
+		fmt.Println("OTP already used")
 		return &service_errors.ServiceError{EndUserMessage: service_errors.OtpUsed}
 	}
+
 	err = cache.Set(u.redisClient, key, val, u.cfg.Otp.ExpireTime*time.Second)
 	if err != nil {
 		return err

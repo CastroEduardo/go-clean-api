@@ -156,11 +156,14 @@ func (h *UsersHandler) RegisterLoginByMobileNumber(c *gin.Context) {
 func (h *UsersHandler) SendOtp(c *gin.Context) {
 	req := new(dto.GetOtpRequest)
 	err := c.ShouldBindJSON(&req)
+
 	if err != nil {
+
 		c.AbortWithStatusJSON(http.StatusBadRequest,
 			helper.GenerateBaseResponseWithValidationError(nil, false, helper.ValidationError, err))
 		return
 	}
+
 	err = h.otpUsecase.SendOtp(req.MobileNumber)
 	if err != nil {
 		c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),

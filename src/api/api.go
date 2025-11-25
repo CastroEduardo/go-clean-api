@@ -2,8 +2,6 @@ package api
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
 
 	"github.com/CastroEduardo/go-clean-api/api/middleware"
 	"github.com/CastroEduardo/go-clean-api/api/router"
@@ -50,7 +48,7 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
 	v1 := api.Group("/v1")
 	{
 		// Test
-		health := v1.Group("/health")
+		// health := v1.Group("/health")
 		testRouter := v1.Group("/test" /*middleware.Authentication(cfg), middleware.Authorization([]string{"admin"})*/)
 
 		// User
@@ -79,8 +77,8 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
 		carModelProperties := v1.Group("/car-model-properties", middleware.Authentication(cfg), middleware.Authorization([]string{"admin"}))
 		carModelComments := v1.Group("/car-model-comments", middleware.Authentication(cfg), middleware.Authorization([]string{"admin", "default"}))
 
-		// Test
-		router.Health(health)
+		// // Test
+		// router.Health(health)
 		router.TestRouter(testRouter)
 
 		// User
@@ -162,16 +160,16 @@ func RegisterPrometheus() {
 		logger.Error(logging.Prometheus, logging.Startup, err.Error(), nil)
 	}
 
-	// Simular cambios en el número de usuarios activos
-	go func() {
-		for {
-			// Generar un número aleatorio de usuarios activos
-			users := rand.Intn(100) // 0-99
-			metrics.ActiveUsers.Set(float64(users))
+	// // Simular cambios en el número de usuarios activos
+	// go func() {
+	// 	for {
+	// 		// Generar un número aleatorio de usuarios activos
+	// 		users := rand.Intn(100) // 0-99
+	// 		metrics.ActiveUsers.Set(float64(users))
 
-			fmt.Println("Usuarios activos:", users)
-			time.Sleep(40 * time.Second)
-		}
-	}()
+	// 		fmt.Println("Usuarios activos:", users)
+	// 		time.Sleep(40 * time.Second)
+	// 	}
+	// }()
 
 }
