@@ -1,13 +1,13 @@
 package handler
 
 import (
+	"github.com/CastroEduardo/go-clean-api/api/dto"
+	_ "github.com/CastroEduardo/go-clean-api/api/helper"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/dependency"
+	_ "github.com/CastroEduardo/go-clean-api/domain/filter"
+	"github.com/CastroEduardo/go-clean-api/usecase"
 	"github.com/gin-gonic/gin"
-	"github.com/naeemaei/golang-clean-web-api/api/dto"
-	_ "github.com/naeemaei/golang-clean-web-api/api/helper"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/dependency"
-	_ "github.com/naeemaei/golang-clean-web-api/domain/filter"
-	"github.com/naeemaei/golang-clean-web-api/usecase"
 )
 
 type GearboxHandler struct {

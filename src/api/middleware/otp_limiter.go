@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/CastroEduardo/go-clean-api/api/helper"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/pkg/limiter"
 	"github.com/gin-gonic/gin"
-	"github.com/naeemaei/golang-clean-web-api/api/helper"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/pkg/limiter"
 	"golang.org/x/time/rate"
 )
 
@@ -27,9 +27,9 @@ func OtpLimiter(cfg *config.Config) gin.HandlerFunc {
 }
 
 func getIP(remoteAddr string) string {
-    ip, _, err := net.SplitHostPort(remoteAddr)
-    if err != nil {
-        return remoteAddr
-    }
-    return ip
+	ip, _, err := net.SplitHostPort(remoteAddr)
+	if err != nil {
+		return remoteAddr
+	}
+	return ip
 }

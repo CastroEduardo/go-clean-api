@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/naeemaei/golang-clean-web-api/usecase/dto"
+	"github.com/CastroEduardo/go-clean-api/usecase/dto"
 )
 
 type CreateCarTypeRequest struct {

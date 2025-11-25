@@ -1,8 +1,8 @@
 package router
 
 import (
+	"github.com/CastroEduardo/go-clean-api/api/handler"
 	"github.com/gin-gonic/gin"
-	"github.com/naeemaei/golang-clean-web-api/api/handler"
 )
 
 func TestRouter(r *gin.RouterGroup) {

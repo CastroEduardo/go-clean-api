@@ -9,16 +9,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/naeemaei/golang-clean-web-api/dependency"
-	_ "github.com/naeemaei/golang-clean-web-api/domain/filter"
-	"github.com/naeemaei/golang-clean-web-api/usecase"
+	"github.com/CastroEduardo/go-clean-api/dependency"
+	_ "github.com/CastroEduardo/go-clean-api/domain/filter"
+	"github.com/CastroEduardo/go-clean-api/usecase"
 
+	"github.com/CastroEduardo/go-clean-api/api/dto"
+	"github.com/CastroEduardo/go-clean-api/api/helper"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/naeemaei/golang-clean-web-api/api/dto"
-	"github.com/naeemaei/golang-clean-web-api/api/helper"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
 )
 
 type FileHandler struct {

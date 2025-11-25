@@ -1,11 +1,11 @@
 package dependency
 
 import (
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/domain/model"
-	contractRepository "github.com/naeemaei/golang-clean-web-api/domain/repository"
-	database "github.com/naeemaei/golang-clean-web-api/infra/persistence/database"
-	infraRepository "github.com/naeemaei/golang-clean-web-api/infra/persistence/repository"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/domain/model"
+	contractRepository "github.com/CastroEduardo/go-clean-api/domain/repository"
+	database "github.com/CastroEduardo/go-clean-api/infra/persistence/database"
+	infraRepository "github.com/CastroEduardo/go-clean-api/infra/persistence/repository"
 )
 
 func GetUserRepository(cfg *config.Config) contractRepository.UserRepository {

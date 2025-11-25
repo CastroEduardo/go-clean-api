@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/CastroEduardo/go-clean-api/api/helper"
+	"github.com/CastroEduardo/go-clean-api/config"
+	constant "github.com/CastroEduardo/go-clean-api/constant"
+	"github.com/CastroEduardo/go-clean-api/pkg/service_errors"
+	"github.com/CastroEduardo/go-clean-api/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/naeemaei/golang-clean-web-api/api/helper"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	constant "github.com/naeemaei/golang-clean-web-api/constant"
-	"github.com/naeemaei/golang-clean-web-api/pkg/service_errors"
-	"github.com/naeemaei/golang-clean-web-api/usecase"
 )
 
 func Authentication(cfg *config.Config) gin.HandlerFunc {

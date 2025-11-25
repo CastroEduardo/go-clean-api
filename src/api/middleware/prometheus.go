@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/CastroEduardo/go-clean-api/pkg/metrics"
 	"github.com/gin-gonic/gin"
-	"github.com/naeemaei/golang-clean-web-api/pkg/metrics"
 )
 
 func Prometheus() gin.HandlerFunc {

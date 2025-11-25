@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/naeemaei/golang-clean-web-api/api"
-	"github.com/naeemaei/golang-clean-web-api/config"
+	"github.com/CastroEduardo/go-clean-api/api"
+	"github.com/CastroEduardo/go-clean-api/config"
 
-	"github.com/naeemaei/golang-clean-web-api/infra/cache"
-	database "github.com/naeemaei/golang-clean-web-api/infra/persistence/database"
-	"github.com/naeemaei/golang-clean-web-api/infra/persistence/migration"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
+	"github.com/CastroEduardo/go-clean-api/infra/cache"
+	database "github.com/CastroEduardo/go-clean-api/infra/persistence/database"
+	"github.com/CastroEduardo/go-clean-api/infra/persistence/migration"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
 )
 
 // @securityDefinitions.apikey AuthBearer

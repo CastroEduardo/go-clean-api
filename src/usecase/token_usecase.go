@@ -3,13 +3,13 @@ package usecase
 import (
 	"time"
 
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/constant"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
+	"github.com/CastroEduardo/go-clean-api/pkg/service_errors"
+	dto "github.com/CastroEduardo/go-clean-api/usecase/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/constant"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
-	"github.com/naeemaei/golang-clean-web-api/pkg/service_errors"
-	dto "github.com/naeemaei/golang-clean-web-api/usecase/dto"
 )
 
 type TokenUsecase struct {

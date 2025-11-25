@@ -3,11 +3,11 @@ package usecase
 import (
 	"context"
 
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/domain/filter"
-	model "github.com/naeemaei/golang-clean-web-api/domain/model"
-	"github.com/naeemaei/golang-clean-web-api/domain/repository"
-	"github.com/naeemaei/golang-clean-web-api/usecase/dto"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/domain/filter"
+	model "github.com/CastroEduardo/go-clean-api/domain/model"
+	"github.com/CastroEduardo/go-clean-api/domain/repository"
+	"github.com/CastroEduardo/go-clean-api/usecase/dto"
 )
 
 type CarTypeUsecase struct {

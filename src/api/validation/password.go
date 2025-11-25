@@ -1,8 +1,8 @@
 package validation
 
 import (
+	"github.com/CastroEduardo/go-clean-api/common"
 	"github.com/go-playground/validator/v10"
-	"github.com/naeemaei/golang-clean-web-api/common"
 )
 
 func PasswordValidator(fld validator.FieldLevel) bool {

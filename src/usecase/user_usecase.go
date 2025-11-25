@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/naeemaei/golang-clean-web-api/common"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	model "github.com/naeemaei/golang-clean-web-api/domain/model"
-	"github.com/naeemaei/golang-clean-web-api/domain/repository"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
-	"github.com/naeemaei/golang-clean-web-api/pkg/metrics"
-	"github.com/naeemaei/golang-clean-web-api/pkg/service_errors"
-	dto "github.com/naeemaei/golang-clean-web-api/usecase/dto"
+	"github.com/CastroEduardo/go-clean-api/common"
+	"github.com/CastroEduardo/go-clean-api/config"
+	model "github.com/CastroEduardo/go-clean-api/domain/model"
+	"github.com/CastroEduardo/go-clean-api/domain/repository"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
+	"github.com/CastroEduardo/go-clean-api/pkg/metrics"
+	"github.com/CastroEduardo/go-clean-api/pkg/service_errors"
+	dto "github.com/CastroEduardo/go-clean-api/usecase/dto"
 	"golang.org/x/crypto/bcrypt"
 )
 

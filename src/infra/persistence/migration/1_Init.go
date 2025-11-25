@@ -3,11 +3,11 @@ package migration
 import (
 	"time"
 
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/constant"
-	models "github.com/naeemaei/golang-clean-web-api/domain/model"
-	database "github.com/naeemaei/golang-clean-web-api/infra/persistence/database"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/constant"
+	models "github.com/CastroEduardo/go-clean-api/domain/model"
+	database "github.com/CastroEduardo/go-clean-api/infra/persistence/database"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

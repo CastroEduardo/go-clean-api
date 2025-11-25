@@ -6,14 +6,14 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/naeemaei/golang-clean-web-api/common"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/constant"
-	filter "github.com/naeemaei/golang-clean-web-api/domain/filter"
-	database "github.com/naeemaei/golang-clean-web-api/infra/persistence/database"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
-	"github.com/naeemaei/golang-clean-web-api/pkg/metrics"
-	"github.com/naeemaei/golang-clean-web-api/pkg/service_errors"
+	"github.com/CastroEduardo/go-clean-api/common"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/constant"
+	filter "github.com/CastroEduardo/go-clean-api/domain/filter"
+	database "github.com/CastroEduardo/go-clean-api/infra/persistence/database"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
+	"github.com/CastroEduardo/go-clean-api/pkg/metrics"
+	"github.com/CastroEduardo/go-clean-api/pkg/service_errors"
 	"gorm.io/gorm"
 )
 

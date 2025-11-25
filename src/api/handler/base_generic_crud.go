@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/CastroEduardo/go-clean-api/api/helper"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/domain/filter"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
 	"github.com/gin-gonic/gin"
-	"github.com/naeemaei/golang-clean-web-api/api/helper"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/domain/filter"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
 )
 
 var logger = logging.NewLogger(config.GetConfig())

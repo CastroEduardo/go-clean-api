@@ -3,7 +3,7 @@ package logging
 import (
 	"fmt"
 
-	"github.com/naeemaei/golang-clean-web-api/config"
+	"github.com/CastroEduardo/go-clean-api/config"
 )
 
 type Logger interface {

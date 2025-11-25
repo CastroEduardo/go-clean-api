@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/CastroEduardo/go-clean-api/api/dto"
+	"github.com/CastroEduardo/go-clean-api/api/helper"
+	"github.com/CastroEduardo/go-clean-api/config"
+	"github.com/CastroEduardo/go-clean-api/constant"
+	"github.com/CastroEduardo/go-clean-api/dependency"
+	"github.com/CastroEduardo/go-clean-api/usecase"
 	"github.com/gin-gonic/gin"
-	"github.com/naeemaei/golang-clean-web-api/api/dto"
-	"github.com/naeemaei/golang-clean-web-api/api/helper"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	"github.com/naeemaei/golang-clean-web-api/constant"
-	"github.com/naeemaei/golang-clean-web-api/dependency"
-	"github.com/naeemaei/golang-clean-web-api/usecase"
 )
 
 type UsersHandler struct {

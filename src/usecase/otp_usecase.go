@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/CastroEduardo/go-clean-api/common"
+	"github.com/CastroEduardo/go-clean-api/config"
+	constant "github.com/CastroEduardo/go-clean-api/constant"
+	"github.com/CastroEduardo/go-clean-api/infra/cache"
+	"github.com/CastroEduardo/go-clean-api/pkg/logging"
+	"github.com/CastroEduardo/go-clean-api/pkg/service_errors"
 	"github.com/go-redis/redis/v7"
-	"github.com/naeemaei/golang-clean-web-api/common"
-	"github.com/naeemaei/golang-clean-web-api/config"
-	constant "github.com/naeemaei/golang-clean-web-api/constant"
-	"github.com/naeemaei/golang-clean-web-api/infra/cache"
-	"github.com/naeemaei/golang-clean-web-api/pkg/logging"
-	"github.com/naeemaei/golang-clean-web-api/pkg/service_errors"
 )
 
 type OtpUsecase struct {

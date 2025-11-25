@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
+	"github.com/CastroEduardo/go-clean-api/api/helper"
 	"github.com/gin-gonic/gin"
-	"github.com/naeemaei/golang-clean-web-api/api/helper"
 )
 
 type HealthHandler struct {
