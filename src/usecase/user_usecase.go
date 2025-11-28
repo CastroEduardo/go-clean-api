@@ -50,7 +50,6 @@ func (u *UserUsecase) LoginByUsername(ctx context.Context, username string, pass
 	metrics.DbCall.WithLabelValues(reflect.TypeOf(tokenDto).String(), "GetById", "Success").Inc()
 
 	// fmt.Println(tokenDto)
-
 	// if len(*user.UserRoles) > 0 {
 	// 	for _, ur := range *user.UserRoles {
 	// 		tokenDto.Roles = append(tokenDto.Roles, ur.Role.Name)

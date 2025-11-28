@@ -13,6 +13,7 @@ type BaseRepository[TEntity any] interface {
 	Delete(ctx context.Context, id int) error
 	GetById(ctx context.Context, id int) (TEntity, error)
 	GetByFilter(ctx context.Context, req filter.PaginationInputWithFilter) (int64, *[]TEntity, error)
+	GetByCode(ctx context.Context, title string) (TEntity, error)
 }
 type CountryRepository interface {
 	BaseRepository[model.Country]
@@ -25,6 +26,10 @@ type CityRepository interface {
 	// Delete(ctx context.Context, id int) error
 	// GetById(ctx context.Context, id int) (model.City, error)
 	// GetByFilter(ctx context.Context, req filter.PaginationInputWithFilter) (int64, *[]model.City, error)
+}
+
+type PersianYearTestRepository interface {
+	BaseRepository[model.PersianYearTest]
 }
 
 type PersianYearRepository interface {

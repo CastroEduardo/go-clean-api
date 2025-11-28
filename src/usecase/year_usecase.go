@@ -10,6 +10,24 @@ import (
 	"github.com/CastroEduardo/go-clean-api/usecase/dto"
 )
 
+// type PersianYearUsecase struct {
+// 	base *BaseUsecase[model.PersianYear, dto.CreatePersianYear, dto.UpdatePersianYear, dto.PersianYear]
+
+// 	testRepo repository.PersianYearTestRepository
+// }
+
+// func NewPersianYearUsecase(
+// 	cfg *config.Config,
+// 	yearRepo repository.PersianYearRepository,
+// 	testRepo repository.PersianYearTestRepository,
+// ) *PersianYearUsecase {
+
+// 	return &PersianYearUsecase{
+// 		base:     NewBaseUsecase[model.PersianYear, dto.CreatePersianYear, dto.UpdatePersianYear, dto.PersianYear](cfg, yearRepo),
+// 		testRepo: testRepo,
+// 	}
+// }
+
 type PersianYearUsecase struct {
 	base *BaseUsecase[model.PersianYear, dto.CreatePersianYear, dto.UpdatePersianYear, dto.PersianYear]
 }
@@ -43,4 +61,9 @@ func (u *PersianYearUsecase) GetById(ctx context.Context, id int) (dto.PersianYe
 // Get By Filter
 func (u *PersianYearUsecase) GetByFilter(ctx context.Context, req filter.PaginationInputWithFilter) (*filter.PagedList[dto.PersianYear], error) {
 	return u.base.GetByFilter(ctx, req)
+}
+
+// Get By Id
+func (u *PersianYearUsecase) GetByCode(ctx context.Context, title string) (dto.PersianYear, error) {
+	return u.base.GetByCode(ctx, title)
 }

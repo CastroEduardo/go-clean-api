@@ -65,18 +65,18 @@ type Company struct {
 }
 
 type CreateColor struct {
-	Name    string 
-	HexCode string 
+	Name    string
+	HexCode string
 }
 
 type UpdateColor struct {
-	Name    string  
-	HexCode string  
+	Name    string
+	HexCode string
 }
 
 type Color struct {
 	IdName
-	HexCode string 
+	HexCode string
 }
 
 type CreatePersianYear struct {
@@ -105,4 +105,26 @@ type PersianYearWithoutDate struct {
 	Id           int
 	PersianTitle string
 	Year         int
+}
+
+type CreatePersianYearTest struct {
+	PersianTitle string
+	Year         int
+	StartAt      time.Time
+	EndAt        time.Time
+}
+
+type PersianYearTest struct {
+	Id           int       `json:"id"`
+	PersianTitle string    `json:"persianTitle"`
+	Year         int       `json:"year"`
+	StartAt      time.Time `json:"startAt"`
+	EndAt        time.Time `json:"endAt"`
+}
+
+type UpdatePersianYearTest struct {
+	PersianTitle *string    `json:"persianTitle"`
+	Year         *int       `json:"year"`
+	StartAt      *time.Time `json:"startAt"`
+	EndAt        *time.Time `json:"endAt"`
 }

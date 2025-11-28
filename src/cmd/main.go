@@ -36,4 +36,5 @@ func main() {
 	migration.Up1()
 
 	api.InitServer(cfg)
+
 }

@@ -187,3 +187,33 @@ func GetByFilter[TUOutput any, TResponse any](c *gin.Context,
 
 	c.JSON(http.StatusOK, helper.GenerateBaseResponse(response, true, 0))
 }
+
+// Get an entity
+// TUOutput: Usecase function output
+// TResponse: Http response body that mapped from TUOutput with TResponse := mapper(TUOutput)
+// responseMapper: this function map usecase output to endpoint output
+// usecaseGet: usecase Get method
+func GetByCode[TUOutput any, TResponse any](c *gin.Context,
+	responseMapper func(req TUOutput) (res TResponse),
+	usecaseGet func(c context.Context, title string) (TUOutput, error)) {
+	title := c.Params.ByName("persian_title")
+	// id, _ := strconv.Atoi(c.Params.ByName("persian_title"))
+	// if id == "" {
+	// 	c.AbortWithStatusJSON(http.StatusNotFound,
+	// 		helper.GenerateBaseResponse(nil, false, helper.ValidationError))
+	// 	return
+	// }
+
+	// call use case method
+	usecaseResult, err := usecaseGet(c, title)
+	if err != nil {
+		c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
+			helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
+		return
+	}
+
+	// map usecase response to http response
+	response := responseMapper(usecaseResult)
+
+	c.JSON(http.StatusOK, helper.GenerateBaseResponse(response, true, 0))
+}

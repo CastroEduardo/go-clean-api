@@ -2,13 +2,16 @@ package handler
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/CastroEduardo/go-clean-api/api/dto"
 	"github.com/CastroEduardo/go-clean-api/api/helper"
 	"github.com/CastroEduardo/go-clean-api/config"
 	"github.com/CastroEduardo/go-clean-api/constant"
 	"github.com/CastroEduardo/go-clean-api/dependency"
+	service "github.com/CastroEduardo/go-clean-api/services/db"
 	"github.com/CastroEduardo/go-clean-api/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -18,13 +21,26 @@ type UsersHandler struct {
 	otpUsecase   *usecase.OtpUsecase
 	tokenUsecase *usecase.TokenUsecase
 	config       *config.Config
+	demo         *usecase.PersianYearUsecase
 }
 
 func NewUserHandler(cfg *config.Config) *UsersHandler {
 	userUsecase := usecase.NewUserUsecase(cfg, dependency.GetUserRepository(cfg))
 	otpUsecase := usecase.NewOtpUsecase(cfg)
 	tokenUsecase := usecase.NewTokenUsecase(cfg)
-	return &UsersHandler{userUsecase: userUsecase, otpUsecase: otpUsecase, tokenUsecase: tokenUsecase, config: cfg}
+	demo := usecase.NewPersianYearUsecase(cfg, dependency.GetPersianYearRepository(cfg))
+	return &UsersHandler{userUsecase: userUsecase, otpUsecase: otpUsecase, tokenUsecase: tokenUsecase, config: cfg, demo: demo}
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
+func randYear(min, max int) int {
+	if max <= min {
+		return min
+	}
+	return rand.Intn(max-min+1) + min
 }
 
 // LoginByUsername godoc
@@ -39,6 +55,7 @@ func NewUserHandler(cfg *config.Config) *UsersHandler {
 // @Failure 409 {object} helper.BaseHttpResponse "Failed"
 // @Router /v1/users/login-by-username [post]
 func (h *UsersHandler) LoginByUsername(c *gin.Context) {
+
 	req := new(dto.LoginByUsernameRequest)
 	err := c.ShouldBindJSON(&req)
 
@@ -54,6 +71,70 @@ func (h *UsersHandler) LoginByUsername(c *gin.Context) {
 			helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
 		return
 	}
+
+	// go func() {
+	// 	for {
+	// 		// NO necesito pasar db
+	roleService := service.NewRoleService()
+
+	result, _ := roleService.FindAll()
+	fmt.Println("ROLES:", result)
+
+	for _, v := range result {
+
+		for _, t := range v.Tags {
+			fmt.Println("==> 👍" + t)
+		}
+
+		for _, t := range v.Tags2 {
+			fmt.Println("==> 💯" + t)
+		}
+
+	}
+	// for _, v := range result {
+	// 	fmt.Println("ROLE:", v.Tags)
+
+	// 	for _, t := range v.Tags {
+	// 		fmt.Println("TAG:", t)
+	// 	}
+	// }
+	// 		roleService.Add(&model.Role{Name: "demo", Tags: []string{"admin"}, Tags2: []string{"admin"}})
+
+	// 		fmt.Println("ADD")
+	// 	}
+
+	// }()
+
+	// nextYear := randYear(1400, 1450)
+
+	// demos := dto.CreatePersianYearRequest{
+	// 	PersianTitle: strconv.Itoa(nextYear),
+	// 	Year:         nextYear,
+	// 	StartAt:      time.Now(),
+	// 	EndAt:        time.Now().AddDate(1, 0, 0),
+	// }
+	// modelData := dto.ToCreatePersianYear(demos)
+
+	// h.demo.Create(c, modelData)
+
+	// fmt.Println("___####")
+
+	// result, err := h.demo.GetByCode(c, "1402")
+
+	// result, err := h.demo.GetByFilter(c, filter.PaginationInputWithFilter{})
+	// // result, err := h.demo.GetByFilter(c, filter.PaginationInputWithFilter{})
+
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
+	// 		helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
+	// 	return
+	// }
+	// fmt.Println(result.StartAt)
+	// for _, v := range *result.Items {
+
+	// 	fmt.Println(v.Year)
+
+	// }
 
 	// Set the refresh token in a cookie
 	http.SetCookie(c.Writer, &http.Cookie{

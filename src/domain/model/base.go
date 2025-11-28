@@ -39,3 +39,12 @@ type File struct {
 	Description string `gorm:"size:500;type:string;not null"`
 	MimeType    string `gorm:"size:20;type:string;not null"`
 }
+
+type PersianYearTest struct {
+	BaseModel
+
+	PersianTitle string    `gorm:"size:10;not null;unique"`
+	Year         int       `gorm:"uniqueIndex;not null"`
+	StartAt      time.Time `gorm:"type:TIMESTAMP with time zone;not null;unique"`
+	EndAt        time.Time `gorm:"type:TIMESTAMP with time zone;not null;unique"`
+}

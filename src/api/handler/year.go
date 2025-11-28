@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/CastroEduardo/go-clean-api/api/dto"
 	_ "github.com/CastroEduardo/go-clean-api/api/helper"
 	"github.com/CastroEduardo/go-clean-api/config"
@@ -82,6 +84,8 @@ func (h *PersianYearHandler) Delete(c *gin.Context) {
 // @Router /v1/years/{id} [get]
 // @Security AuthBearer
 func (h *PersianYearHandler) GetById(c *gin.Context) {
+
+	fmt.Println(c.Params)
 	GetById(c, dto.ToPersianYearResponse, h.usecase.GetById)
 }
 
@@ -99,4 +103,20 @@ func (h *PersianYearHandler) GetById(c *gin.Context) {
 func (h *PersianYearHandler) GetByFilter(c *gin.Context) {
 
 	GetByFilter(c, dto.ToPersianYearResponse, h.usecase.GetByFilter)
+}
+
+// GetPersianYears godoc
+// @Summary Get PersianYears
+// @Description Get PersianYears
+// @Tags PersianYears
+// @Accept json
+// @produces json
+// @Param Request body filter.PaginationInputWithFilter true "Request"
+// @Success 200 {object} helper.BaseHttpResponse{result=filter.PagedList[dto.PersianYearResponse]} "PersianYear response"
+// @Failure 400 {object} helper.BaseHttpResponse "Bad request"
+// @Router /v1/years/get-by-filter [post]
+// @Security AuthBearer
+func (h *PersianYearHandler) GetByFilter2(c *gin.Context) {
+
+	GetByCode(c, dto.ToPersianYearResponse, h.usecase.GetByCode)
 }

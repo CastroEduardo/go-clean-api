@@ -40,6 +40,7 @@ func InitServer(cfg *config.Config) {
 	if err != nil {
 		logger.Fatal(logging.General, logging.Startup, err.Error(), nil)
 	}
+
 }
 
 func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
@@ -48,8 +49,9 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
 	v1 := api.Group("/v1")
 	{
 		// Test
-		// health := v1.Group("/health")
+		health := v1.Group("/health")
 		testRouter := v1.Group("/test" /*middleware.Authentication(cfg), middleware.Authorization([]string{"admin"})*/)
+		//testRouter := v1.Group("/test", middleware.Authentication(cfg), middleware.Authorization([]string{"admin"}))
 
 		// User
 		users := v1.Group("/users")
@@ -61,6 +63,8 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
 		companies := v1.Group("/companies", middleware.Authentication(cfg), middleware.Authorization([]string{"admin"}))
 		colors := v1.Group("/colors", middleware.Authentication(cfg), middleware.Authorization([]string{"admin"}))
 		years := v1.Group("/years", middleware.Authentication(cfg), middleware.Authorization([]string{"admin"}))
+
+		// years := v1.Group("/years", middleware.Authentication(cfg), middleware.Authorization([]string{"admin"}))
 
 		// Property
 		properties := v1.Group("/properties", middleware.Authentication(cfg), middleware.Authorization([]string{"admin"}))
@@ -78,7 +82,7 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
 		carModelComments := v1.Group("/car-model-comments", middleware.Authentication(cfg), middleware.Authorization([]string{"admin", "default"}))
 
 		// // Test
-		// router.Health(health)
+		router.Health(health)
 		router.TestRouter(testRouter)
 
 		// User

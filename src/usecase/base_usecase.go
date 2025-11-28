@@ -72,3 +72,12 @@ func (u *BaseUsecase[TEntity, TCreate, TUpdate, TResponse]) GetByFilter(ctx cont
 
 	return filter.Paginate[TEntity, TResponse](count, entities, req.PageNumber, int64(req.PageSize))
 }
+
+func (u *BaseUsecase[TEntity, TCreate, TUpdate, TResponse]) GetByCode(ctx context.Context, title string) (TResponse, error) {
+	var response TResponse
+	entity, err := u.repository.GetByCode(ctx, title)
+	if err != nil {
+		return response, err
+	}
+	return common.TypeConverter[TResponse](entity)
+}

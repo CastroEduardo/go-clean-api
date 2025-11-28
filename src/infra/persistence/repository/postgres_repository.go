@@ -18,6 +18,7 @@ import (
 )
 
 const softDeleteExp string = "id = ? and deleted_by is null"
+const titleDeleteExp string = "persian_title = ? and deleted_by is null"
 
 type BaseRepository[TEntity any] struct {
 	database *gorm.DB
@@ -143,4 +144,19 @@ func (r BaseRepository[TEntity]) GetByFilter(ctx context.Context, req filter.Pag
 	}
 	return totalRows, items, err
 
+}
+
+func (r BaseRepository[TEntity]) GetByCode(ctx context.Context, title string) (TEntity, error) {
+	model := new(TEntity)
+	db := database.Preload(r.database, r.preloads)
+	err := db.
+		Where(titleDeleteExp, title).
+		First(model).
+		Error
+	if err != nil {
+		metrics.DbCall.WithLabelValues(reflect.TypeOf(*model).String(), "GetByCode", "Failed").Inc()
+		return *model, err
+	}
+	metrics.DbCall.WithLabelValues(reflect.TypeOf(*model).String(), "GetByCode", "Success").Inc()
+	return *model, nil
 }

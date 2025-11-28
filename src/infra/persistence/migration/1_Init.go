@@ -1,6 +1,7 @@
 package migration
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/CastroEduardo/go-clean-api/config"
@@ -19,6 +20,16 @@ var logger = logging.NewLogger(config.GetConfig())
 func Up1() {
 	database := database.GetDb()
 
+	// // Crear servicio
+	// roleService := service.NewRoleService(database)
+
+	// // Crear un rol si no existe
+	// admin, err := roleService.CreateIfNotExists("adminee")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// fmt.Println("Role:", admin)
 	createTables(database)
 	createDefaultUserInformation(database)
 	// createCountry(database)
@@ -44,8 +55,8 @@ func createTables(database *gorm.DB) {
 
 	// User
 	tables = addNewTable(database, models.User{}, tables)
-	// tables = addNewTable(database, models.Role{}, tables)
-	// tables = addNewTable(database, models.UserRole{}, tables)
+	tables = addNewTable(database, models.Role{}, tables)
+	tables = addNewTable(database, models.UserRole{}, tables)
 
 	// // Car
 	// tables = addNewTable(database, models.Company{}, tables)
@@ -77,10 +88,10 @@ func addNewTable(database *gorm.DB, model interface{}, tables []interface{}) []i
 
 func createDefaultUserInformation(database *gorm.DB) {
 
-	adminRole := models.Role{Name: constant.AdminRoleName}
+	adminRole := models.Role{Name: constant.AdminRoleName, Tags2: []string{"admin1", "admin2"}}
 	createRoleIfNotExists(database, &adminRole)
 
-	defaultRole := models.Role{Name: constant.DefaultRoleName}
+	defaultRole := models.Role{Name: constant.DefaultRoleName, Tags: []string{"DEfault1", "DEfault2"}}
 	createRoleIfNotExists(database, &defaultRole)
 
 	u := models.User{Username: constant.DefaultUserName, FirstName: "Test", LastName: "Test",
@@ -112,11 +123,18 @@ func createAdminUserIfNotExists(database *gorm.DB, u *models.User, roleId int) {
 		Select("1").
 		Where("username = ?", u.Username).
 		First(&exists)
+
+	fmt.Println("EXISTS USER:", exists)
+	fmt.Println(u)
+	fmt.Println(roleId)
+
 	if exists == 0 {
 		database.Create(u)
 		ur := models.UserRole{UserId: u.Id, RoleId: roleId}
 		database.Create(&ur)
 	}
+
+	// time.Sleep(time.Duration(10 * time.Second))
 }
 
 func createCountry(database *gorm.DB) {

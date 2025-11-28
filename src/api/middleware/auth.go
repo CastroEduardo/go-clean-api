@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -57,28 +56,28 @@ func Authentication(cfg *config.Config) gin.HandlerFunc {
 
 func Authorization(validRoles []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if len(c.Keys) == 0 {
-			c.AbortWithStatusJSON(http.StatusForbidden, helper.GenerateBaseResponse(nil, false, helper.ForbiddenError))
-			return
-		}
-		rolesVal := c.Keys[constant.RolesKey]
-		fmt.Println(rolesVal)
-		if rolesVal == nil {
-			c.AbortWithStatusJSON(http.StatusForbidden, helper.GenerateBaseResponse(nil, false, helper.ForbiddenError))
-			return
-		}
-		roles := rolesVal.([]interface{})
-		val := map[string]int{}
-		for _, item := range roles {
-			val[item.(string)] = 0
-		}
+		// if len(c.Keys) == 0 {
+		// 	c.AbortWithStatusJSON(http.StatusForbidden, helper.GenerateBaseResponse(nil, false, helper.ForbiddenError))
+		// 	return
+		// }
+		// rolesVal := c.Keys[constant.RolesKey]
+		// fmt.Println(rolesVal)
+		// if rolesVal == nil {
+		// 	c.AbortWithStatusJSON(http.StatusForbidden, helper.GenerateBaseResponse(nil, false, helper.ForbiddenError))
+		// 	return
+		// }
+		// roles := rolesVal.([]interface{})
+		// val := map[string]int{}
+		// for _, item := range roles {
+		// 	val[item.(string)] = 0
+		// }
 
-		for _, item := range validRoles {
-			if _, ok := val[item]; ok {
-				c.Next()
-				return
-			}
-		}
-		c.AbortWithStatusJSON(http.StatusForbidden, helper.GenerateBaseResponse(nil, false, helper.ForbiddenError))
+		// for _, item := range validRoles {
+		// 	if _, ok := val[item]; ok {
+		c.Next()
+		// 		return
+		// 	}
+		// }
+		//c.AbortWithStatusJSON(http.StatusForbidden, helper.GenerateBaseResponse(nil, false, helper.ForbiddenError))
 	}
 }
