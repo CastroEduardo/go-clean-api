@@ -13,7 +13,7 @@ type RoleService struct {
 	db *gorm.DB
 }
 
-func NewRoleService() *RoleService {
+func NewDbRoleService() *RoleService {
 	return &RoleService{
 		db: database.GetDb(),
 	}

@@ -37,7 +37,9 @@ func (r *PostgresUserRepository) CreateUser(ctx context.Context, u model.User) (
 		r.logger.Error(logging.Postgres, logging.Rollback, err.Error(), nil)
 		return u, err
 	}
-	err = tx.Create(&model.UserRole{RoleId: roleId, UserId: u.Id}).Error
+	err = tx.Create(&model.UserRole{RoleID: roleId, UserID: u.Id, IdentityCompany: model.IdentityCompany{
+		CompanyID: 1,
+	}}).Error
 	if err != nil {
 		tx.Rollback()
 		r.logger.Error(logging.Postgres, logging.Rollback, err.Error(), nil)

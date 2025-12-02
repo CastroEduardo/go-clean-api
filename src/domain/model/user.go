@@ -4,33 +4,44 @@ import (
 	"gorm.io/datatypes"
 )
 
+type IdentityCompany struct {
+	Company   Company `gorm:"foreignKey:CompanyID;constraint:OnUpdate:NO ACTION;OnDelete:NO ACTION"`
+	CompanyID int
+}
 type User struct {
 	BaseModel
-	Username     string `gorm:"type:string;size:50;not null;unique"`
-	FirstName    string `gorm:"type:string;size:20;null"`
-	LastName     string `gorm:"type:string;size:20;null"`
-	MobileNumber string `gorm:"type:string;size:20;null;unique;default:null"`
-	Email        string `gorm:"type:string;size:64;null;unique;default:null"`
-	Password     string `gorm:"type:string;size:64;not null"`
+
+	Username     string `gorm:"size:50;not null;unique"`
+	FirstName    string `gorm:"size:20"`
+	LastName     string `gorm:"size:20"`
+	MobileNumber string `gorm:"size:20;unique"`
+	Email        string `gorm:"size:64;unique"`
+	Password     string `gorm:"size:64;not null"`
 	Enabled      bool   `gorm:"default:true"`
 
-	// UserRoles    *[]UserRole
+	IdentityCompany
+	// UserRoles []UserRole  // opcional según tu diseño
 }
 
 type Role struct {
 	BaseModel
-	Name  string                      `gorm:"type:string;size:20;not null,unique"`
-	Tags  datatypes.JSONSlice[string] `gorm:"type:jsonb"`
-	Tags2 datatypes.JSONSlice[string] `gorm:"type:jsonb"`
-	// Usa el tipo StringSlice de GORM
 
-	UserRoles *[]UserRole
+	Name           string                      `gorm:"size:20;not null;unique"`
+	AllowedURLs    datatypes.JSONSlice[string] `gorm:"type:jsonb"`
+	AllowedActions datatypes.JSONSlice[string] `gorm:"type:jsonb"`
+
+	UserRoles []UserRole
+	IdentityCompany
 }
 
 type UserRole struct {
 	BaseModel
-	User   User `gorm:"foreignKey:UserId;constraint:OnUpdate:NO ACTION;OnDelete:NO ACTION"`
-	Role   Role `gorm:"foreignKey:RoleId;constraint:OnUpdate:NO ACTION;OnDelete:NO ACTION"`
-	UserId int
-	RoleId int
+
+	UserID int
+	RoleID int
+
+	User User `gorm:"foreignKey:UserID;constraint:OnUpdate:NO ACTION;OnDelete:NO ACTION"`
+	Role Role `gorm:"foreignKey:RoleID;constraint:OnUpdate:NO ACTION;OnDelete:NO ACTION"`
+
+	IdentityCompany
 }

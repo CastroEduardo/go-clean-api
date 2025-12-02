@@ -1,6 +1,7 @@
 package migration
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -53,6 +54,9 @@ func createTables(database *gorm.DB) {
 	// tables = addNewTable(database, models.PropertyCategory{}, tables)
 	// tables = addNewTable(database, models.Property{}, tables)
 
+	//Create Company
+	tables = addNewTable(database, models.Company{}, tables)
+
 	// User
 	tables = addNewTable(database, models.User{}, tables)
 	tables = addNewTable(database, models.Role{}, tables)
@@ -88,11 +92,29 @@ func addNewTable(database *gorm.DB, model interface{}, tables []interface{}) []i
 
 func createDefaultUserInformation(database *gorm.DB) {
 
-	adminRole := models.Role{Name: constant.AdminRoleName, Tags2: []string{"admin1", "admin2"}}
-	createRoleIfNotExists(database, &adminRole)
+	newCompany := models.Company{
+		Name:      "Default Company",
+		ShortName: "DefComp",
+		Status:    1,
+		Address:   "123 Default St, City, Country",
+		Phone:     "+1234567890",
+		Email:     "demo@gmail.com",
+		Website:   "www.defaultcompany.com",
+		Identity:  "DEF123456",
+		Tz:        "UTC",
+		License:   "Default License Info",
+	}
 
-	defaultRole := models.Role{Name: constant.DefaultRoleName, Tags: []string{"DEfault1", "DEfault2"}}
-	createRoleIfNotExists(database, &defaultRole)
+	resultAddCompany, _ := createCompanyIfNotExists(database, &newCompany)
+	// fmt.Println("Result of creating company:", resultAddCompany.Id)
+
+	time.Sleep(time.Duration(2 * time.Second))
+
+	adminRole := models.Role{Name: constant.AdminRoleName, AllowedURLs: []string{"admin1", "admin2"}}
+	createRoleIfNotExists(database, &adminRole, resultAddCompany)
+
+	defaultRole := models.Role{Name: constant.DefaultRoleName, AllowedActions: []string{"DEfault1", "DEfault2"}}
+	createRoleIfNotExists(database, &defaultRole, resultAddCompany)
 
 	u := models.User{Username: constant.DefaultUserName, FirstName: "Test", LastName: "Test",
 		MobileNumber: "09111112222", Email: "admin@admin.com"}
@@ -100,11 +122,34 @@ func createDefaultUserInformation(database *gorm.DB) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	u.Password = string(hashedPassword)
 
-	createAdminUserIfNotExists(database, &u, adminRole.Id)
+	createAdminUserIfNotExists(database, &u, adminRole.Id, resultAddCompany)
 
 }
 
-func createRoleIfNotExists(database *gorm.DB, r *models.Role) {
+func createCompanyIfNotExists(db *gorm.DB, r *models.Company) (*models.Company, error) {
+	var existing models.Company
+
+	// Buscar si ya existe por Identity
+	err := db.Where("Identity = ?", r.Identity).First(&existing).Error
+
+	// No existe → crearlo
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		if err := db.Create(r).Error; err != nil {
+			return nil, err
+		}
+		return r, nil
+	}
+
+	// Otro error inesperado
+	if err != nil {
+		return nil, err
+	}
+
+	// Ya existía → devolver el existente
+	return &existing, nil
+}
+
+func createRoleIfNotExists(database *gorm.DB, r *models.Role, company *models.Company) {
 	exists := 0
 	database.
 		Model(&models.Role{}).
@@ -112,11 +157,12 @@ func createRoleIfNotExists(database *gorm.DB, r *models.Role) {
 		Where("name = ?", r.Name).
 		First(&exists)
 	if exists == 0 {
+		r.IdentityCompany.CompanyID = company.Id
 		database.Create(r)
 	}
 }
 
-func createAdminUserIfNotExists(database *gorm.DB, u *models.User, roleId int) {
+func createAdminUserIfNotExists(database *gorm.DB, u *models.User, roleId int, company *models.Company) {
 	exists := 0
 	database.
 		Model(&models.User{}).
@@ -125,274 +171,277 @@ func createAdminUserIfNotExists(database *gorm.DB, u *models.User, roleId int) {
 		First(&exists)
 
 	fmt.Println("EXISTS USER:", exists)
-	fmt.Println(u)
+	fmt.Println()
 	fmt.Println(roleId)
+	u.IdentityCompany.CompanyID = company.Id
 
 	if exists == 0 {
 		database.Create(u)
-		ur := models.UserRole{UserId: u.Id, RoleId: roleId}
+		ur := models.UserRole{UserID: u.Id, RoleID: roleId,
+			IdentityCompany: models.IdentityCompany{
+				CompanyID: company.Id,
+			}}
 		database.Create(&ur)
-	}
-
-	// time.Sleep(time.Duration(10 * time.Second))
-}
-
-func createCountry(database *gorm.DB) {
-	count := 0
-	database.
-		Model(&models.Country{}).
-		Select(countStarExp).
-		Find(&count)
-	if count == 0 {
-		database.Create(&models.Country{Name: "Iran", Cities: []models.City{
-			{Name: "Tehran"},
-			{Name: "Isfahan"},
-			{Name: "Shiraz"},
-			{Name: "Chalus"},
-			{Name: "Ahwaz"},
-		}, Companies: []models.Company{
-			{Name: "Saipa"},
-			{Name: "Iran khodro"},
-		}})
-		database.Create(&models.Country{Name: "USA", Cities: []models.City{
-			{Name: "New York"},
-			{Name: "Washington"},
-		}, Companies: []models.Company{
-			{Name: "Tesla"},
-			{Name: "Jeep"},
-		}})
-		database.Create(&models.Country{Name: "Germany", Cities: []models.City{
-			{Name: "Berlin"},
-			{Name: "Munich"},
-		}, Companies: []models.Company{
-			{Name: "Opel"},
-			{Name: "Benz"},
-		}})
-		database.Create(&models.Country{Name: "China", Cities: []models.City{
-			{Name: "Beijing"},
-			{Name: "Shanghai"},
-		}, Companies: []models.Company{
-			{Name: "Chery"},
-			{Name: "Geely"},
-		}})
-		database.Create(&models.Country{Name: "Italy", Cities: []models.City{
-			{Name: "Roma"},
-			{Name: "Turin"},
-		}, Companies: []models.Company{
-			{Name: "Ferrari"},
-			{Name: "Fiat"},
-		}})
-		database.Create(&models.Country{Name: "France", Cities: []models.City{
-			{Name: "Paris"},
-			{Name: "Lyon"},
-		}, Companies: []models.Company{
-			{Name: "Renault"},
-			{Name: "Bugatti"},
-		}})
-		database.Create(&models.Country{Name: "Japan", Cities: []models.City{
-			{Name: "Tokyo"},
-			{Name: "Kyoto"},
-		}, Companies: []models.Company{
-			{Name: "Toyota"},
-			{Name: "Honda"},
-		}})
-		database.Create(&models.Country{Name: "South Korea", Cities: []models.City{
-			{Name: "Seoul"},
-			{Name: "Ulsan"},
-		}, Companies: []models.Company{
-			{Name: "Kia"},
-			{Name: "Hyundai"},
-		}})
+		// time.Sleep(time.Duration(10 * time.Second))
 	}
 }
 
-func createPropertyCategory(database *gorm.DB) {
-	count := 0
+// func createCountry(database *gorm.DB) {
+// 	count := 0
+// 	database.
+// 		Model(&models.Country{}).
+// 		Select(countStarExp).
+// 		Find(&count)
+// 	if count == 0 {
+// 		database.Create(&models.Country{Name: "Iran", Cities: []models.City{
+// 			{Name: "Tehran"},
+// 			{Name: "Isfahan"},
+// 			{Name: "Shiraz"},
+// 			{Name: "Chalus"},
+// 			{Name: "Ahwaz"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Saipa"},
+// 			{Name: "Iran khodro"},
+// 		}})
+// 		database.Create(&models.Country{Name: "USA", Cities: []models.City{
+// 			{Name: "New York"},
+// 			{Name: "Washington"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Tesla"},
+// 			{Name: "Jeep"},
+// 		}})
+// 		database.Create(&models.Country{Name: "Germany", Cities: []models.City{
+// 			{Name: "Berlin"},
+// 			{Name: "Munich"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Opel"},
+// 			{Name: "Benz"},
+// 		}})
+// 		database.Create(&models.Country{Name: "China", Cities: []models.City{
+// 			{Name: "Beijing"},
+// 			{Name: "Shanghai"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Chery"},
+// 			{Name: "Geely"},
+// 		}})
+// 		database.Create(&models.Country{Name: "Italy", Cities: []models.City{
+// 			{Name: "Roma"},
+// 			{Name: "Turin"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Ferrari"},
+// 			{Name: "Fiat"},
+// 		}})
+// 		database.Create(&models.Country{Name: "France", Cities: []models.City{
+// 			{Name: "Paris"},
+// 			{Name: "Lyon"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Renault"},
+// 			{Name: "Bugatti"},
+// 		}})
+// 		database.Create(&models.Country{Name: "Japan", Cities: []models.City{
+// 			{Name: "Tokyo"},
+// 			{Name: "Kyoto"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Toyota"},
+// 			{Name: "Honda"},
+// 		}})
+// 		database.Create(&models.Country{Name: "South Korea", Cities: []models.City{
+// 			{Name: "Seoul"},
+// 			{Name: "Ulsan"},
+// 		}, Companies: []models.Company{
+// 			{Name: "Kia"},
+// 			{Name: "Hyundai"},
+// 		}})
+// 	}
+// }
 
-	database.
-		Model(&models.PropertyCategory{}).
-		Select(countStarExp).
-		Find(&count)
-	if count == 0 {
-		database.Create(&models.PropertyCategory{Name: "Body"})                     // بدنه
-		database.Create(&models.PropertyCategory{Name: "Engine"})                   // موتور
-		database.Create(&models.PropertyCategory{Name: "Drivetrain"})               // پیشرانه
-		database.Create(&models.PropertyCategory{Name: "Suspension"})               // تعلیق
-		database.Create(&models.PropertyCategory{Name: "Equipment"})                // تجهیزات
-		database.Create(&models.PropertyCategory{Name: "Driver support systems"})   // سیستم های پشتیبانی راننده
-		database.Create(&models.PropertyCategory{Name: "Lights"})                   // چراغ ها
-		database.Create(&models.PropertyCategory{Name: "Multimedia"})               // چند رسانه ای
-		database.Create(&models.PropertyCategory{Name: "Safety equipment"})         // تجهیزات ایمنی
-		database.Create(&models.PropertyCategory{Name: "Seats and steering wheel"}) // صندلی و فرمان
-		database.Create(&models.PropertyCategory{Name: "Windows and mirrors"})      // پنجره و آینه
-	}
-	createProperty(database, "Body")
-	createProperty(database, "Engine")
-	createProperty(database, "Drivetrain")
-	createProperty(database, "Suspension")
-	createProperty(database, "Comfort")
-	createProperty(database, "Driver support systems")
-	createProperty(database, "Lights")
-	createProperty(database, "Multimedia")
-	createProperty(database, "Safety equipment")
-	createProperty(database, "Seats and steering wheel")
-	createProperty(database, "Windows and mirrors")
+// func createPropertyCategory(database *gorm.DB) {
+// 	count := 0
 
-}
+// 	database.
+// 		Model(&models.PropertyCategory{}).
+// 		Select(countStarExp).
+// 		Find(&count)
+// 	if count == 0 {
+// 		database.Create(&models.PropertyCategory{Name: "Body"})                     // بدنه
+// 		database.Create(&models.PropertyCategory{Name: "Engine"})                   // موتور
+// 		database.Create(&models.PropertyCategory{Name: "Drivetrain"})               // پیشرانه
+// 		database.Create(&models.PropertyCategory{Name: "Suspension"})               // تعلیق
+// 		database.Create(&models.PropertyCategory{Name: "Equipment"})                // تجهیزات
+// 		database.Create(&models.PropertyCategory{Name: "Driver support systems"})   // سیستم های پشتیبانی راننده
+// 		database.Create(&models.PropertyCategory{Name: "Lights"})                   // چراغ ها
+// 		database.Create(&models.PropertyCategory{Name: "Multimedia"})               // چند رسانه ای
+// 		database.Create(&models.PropertyCategory{Name: "Safety equipment"})         // تجهیزات ایمنی
+// 		database.Create(&models.PropertyCategory{Name: "Seats and steering wheel"}) // صندلی و فرمان
+// 		database.Create(&models.PropertyCategory{Name: "Windows and mirrors"})      // پنجره و آینه
+// 	}
+// 	createProperty(database, "Body")
+// 	createProperty(database, "Engine")
+// 	createProperty(database, "Drivetrain")
+// 	createProperty(database, "Suspension")
+// 	createProperty(database, "Comfort")
+// 	createProperty(database, "Driver support systems")
+// 	createProperty(database, "Lights")
+// 	createProperty(database, "Multimedia")
+// 	createProperty(database, "Safety equipment")
+// 	createProperty(database, "Seats and steering wheel")
+// 	createProperty(database, "Windows and mirrors")
 
-func createProperty(database *gorm.DB, cat string) {
-	count := 0
-	catModel := models.PropertyCategory{}
+// }
 
-	database.
-		Model(models.PropertyCategory{}).
-		Where("name = ?", cat).
-		Find(&catModel)
+// func createProperty(database *gorm.DB, cat string) {
+// 	count := 0
+// 	catModel := models.PropertyCategory{}
 
-	database.
-		Model(&models.Property{}).
-		Select(countStarExp).
-		Where("category_id = ?", catModel.Id).
-		Find(&count)
+// 	database.
+// 		Model(models.PropertyCategory{}).
+// 		Where("name = ?", cat).
+// 		Find(&catModel)
 
-	if count > 0 || catModel.Id == 0 {
-		return
-	}
-	var props *[]models.Property
-	switch cat {
-	case "Body":
-		props = getBodyProperties(catModel.Id)
+// 	database.
+// 		Model(&models.Property{}).
+// 		Select(countStarExp).
+// 		Where("category_id = ?", catModel.Id).
+// 		Find(&count)
 
-	case "Engine":
-		props = getEngineProperties(catModel.Id)
+// 	if count > 0 || catModel.Id == 0 {
+// 		return
+// 	}
+// 	var props *[]models.Property
+// 	switch cat {
+// 	case "Body":
+// 		props = getBodyProperties(catModel.Id)
 
-	case "Drivetrain":
-		props = getDrivetrainProperties(catModel.Id)
+// 	case "Engine":
+// 		props = getEngineProperties(catModel.Id)
 
-	case "Suspension":
-		props = getSuspensionProperties(catModel.Id)
+// 	case "Drivetrain":
+// 		props = getDrivetrainProperties(catModel.Id)
 
-	case "Comfort":
-		props = getComfortProperties(catModel.Id)
+// 	case "Suspension":
+// 		props = getSuspensionProperties(catModel.Id)
 
-	case "Driver support systems":
-		props = getDriverSupportSystemProperties(catModel.Id)
+// 	case "Comfort":
+// 		props = getComfortProperties(catModel.Id)
 
-	case "Lights":
-		props = getLightsProperties(catModel.Id)
+// 	case "Driver support systems":
+// 		props = getDriverSupportSystemProperties(catModel.Id)
 
-	case "Multimedia":
-		props = getMultimediaProperties(catModel.Id)
+// 	case "Lights":
+// 		props = getLightsProperties(catModel.Id)
 
-	case "Safety equipment":
-		props = getSafetyEquipmentProperties(catModel.Id)
+// 	case "Multimedia":
+// 		props = getMultimediaProperties(catModel.Id)
 
-	case "Seats and steering wheel":
-		props = getSeatsProperties(catModel.Id)
+// 	case "Safety equipment":
+// 		props = getSafetyEquipmentProperties(catModel.Id)
 
-	case "Windows and mirrors":
-		props = getWindowsProperties(catModel.Id)
+// 	case "Seats and steering wheel":
+// 		props = getSeatsProperties(catModel.Id)
 
-	default:
-		props = &([]models.Property{})
-	}
+// 	case "Windows and mirrors":
+// 		props = getWindowsProperties(catModel.Id)
 
-	for _, prop := range *props {
-		database.Create(&prop)
-	}
-}
+// 	default:
+// 		props = &([]models.Property{})
+// 	}
 
-func createCarType(database *gorm.DB) {
-	count := 0
-	database.
-		Model(&models.CarType{}).
-		Select(countStarExp).
-		Find(&count)
-	if count == 0 {
-		database.Create(&models.CarType{Name: "Crossover"})
-		database.Create(&models.CarType{Name: "Sedan"})
-		database.Create(&models.CarType{Name: "Sports"})
-		database.Create(&models.CarType{Name: "Coupe"})
-		database.Create(&models.CarType{Name: "Hatchback"})
-	}
-}
+// 	for _, prop := range *props {
+// 		database.Create(&prop)
+// 	}
+// }
 
-func createGearbox(database *gorm.DB) {
-	count := 0
-	database.
-		Model(&models.Gearbox{}).
-		Select(countStarExp).
-		Find(&count)
-	if count == 0 {
-		database.Create(&models.Gearbox{Name: "Manual"})
-		database.Create(&models.Gearbox{Name: "Automatic"})
-	}
-}
+// func createCarType(database *gorm.DB) {
+// 	count := 0
+// 	database.
+// 		Model(&models.CarType{}).
+// 		Select(countStarExp).
+// 		Find(&count)
+// 	if count == 0 {
+// 		database.Create(&models.CarType{Name: "Crossover"})
+// 		database.Create(&models.CarType{Name: "Sedan"})
+// 		database.Create(&models.CarType{Name: "Sports"})
+// 		database.Create(&models.CarType{Name: "Coupe"})
+// 		database.Create(&models.CarType{Name: "Hatchback"})
+// 	}
+// }
 
-func createColor(database *gorm.DB) {
-	count := 0
-	database.
-		Model(&models.Color{}).
-		Select(countStarExp).
-		Find(&count)
-	if count == 0 {
-		database.Create(&models.Color{Name: "Black", HexCode: "#000000"})
-		database.Create(&models.Color{Name: "White", HexCode: "#ffffff"})
-		database.Create(&models.Color{Name: "Blue", HexCode: "#0000ff"})
-	}
-}
+// func createGearbox(database *gorm.DB) {
+// 	count := 0
+// 	database.
+// 		Model(&models.Gearbox{}).
+// 		Select(countStarExp).
+// 		Find(&count)
+// 	if count == 0 {
+// 		database.Create(&models.Gearbox{Name: "Manual"})
+// 		database.Create(&models.Gearbox{Name: "Automatic"})
+// 	}
+// }
 
-func createYear(database *gorm.DB) {
-	count := 0
-	database.
-		Model(&models.PersianYear{}).
-		Select(countStarExp).
-		Find(&count)
-	if count == 0 {
+// func createColor(database *gorm.DB) {
+// 	count := 0
+// 	database.
+// 		Model(&models.Color{}).
+// 		Select(countStarExp).
+// 		Find(&count)
+// 	if count == 0 {
+// 		database.Create(&models.Color{Name: "Black", HexCode: "#000000"})
+// 		database.Create(&models.Color{Name: "White", HexCode: "#ffffff"})
+// 		database.Create(&models.Color{Name: "Blue", HexCode: "#0000ff"})
+// 	}
+// }
 
-		database.Create(&models.PersianYear{
-			PersianTitle: "1402",
-			Year:         1402,
-			StartAt:      time.Date(2023, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-			EndAt:        time.Date(2024, time.Month(3), 20, 0, 0, 0, 0, time.UTC),
-		})
+// func createYear(database *gorm.DB) {
+// 	count := 0
+// 	database.
+// 		Model(&models.PersianYear{}).
+// 		Select(countStarExp).
+// 		Find(&count)
+// 	if count == 0 {
 
-		database.Create(&models.PersianYear{
-			PersianTitle: "1401",
-			Year:         1401,
-			StartAt:      time.Date(2022, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-			EndAt:        time.Date(2023, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-		})
+// 		database.Create(&models.PersianYear{
+// 			PersianTitle: "1402",
+// 			Year:         1402,
+// 			StartAt:      time.Date(2023, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 			EndAt:        time.Date(2024, time.Month(3), 20, 0, 0, 0, 0, time.UTC),
+// 		})
 
-		database.Create(&models.PersianYear{
-			PersianTitle: "1400",
-			Year:         1400,
-			StartAt:      time.Date(2021, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-			EndAt:        time.Date(2022, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-		})
+// 		database.Create(&models.PersianYear{
+// 			PersianTitle: "1401",
+// 			Year:         1401,
+// 			StartAt:      time.Date(2022, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 			EndAt:        time.Date(2023, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 		})
 
-		database.Create(&models.PersianYear{
-			PersianTitle: "1399",
-			Year:         1399,
-			StartAt:      time.Date(2020, time.Month(3), 20, 0, 0, 0, 0, time.UTC),
-			EndAt:        time.Date(2021, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-		})
+// 		database.Create(&models.PersianYear{
+// 			PersianTitle: "1400",
+// 			Year:         1400,
+// 			StartAt:      time.Date(2021, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 			EndAt:        time.Date(2022, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 		})
 
-		database.Create(&models.PersianYear{
-			PersianTitle: "1398",
-			Year:         1398,
-			StartAt:      time.Date(2019, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-			EndAt:        time.Date(2020, time.Month(3), 20, 0, 0, 0, 0, time.UTC),
-		})
+// 		database.Create(&models.PersianYear{
+// 			PersianTitle: "1399",
+// 			Year:         1399,
+// 			StartAt:      time.Date(2020, time.Month(3), 20, 0, 0, 0, 0, time.UTC),
+// 			EndAt:        time.Date(2021, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 		})
 
-		database.Create(&models.PersianYear{
-			PersianTitle: "1398",
-			Year:         1398,
-			StartAt:      time.Date(2018, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-			EndAt:        time.Date(2019, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
-		})
-	}
-}
+// 		database.Create(&models.PersianYear{
+// 			PersianTitle: "1398",
+// 			Year:         1398,
+// 			StartAt:      time.Date(2019, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 			EndAt:        time.Date(2020, time.Month(3), 20, 0, 0, 0, 0, time.UTC),
+// 		})
+
+// 		database.Create(&models.PersianYear{
+// 			PersianTitle: "1398",
+// 			Year:         1398,
+// 			StartAt:      time.Date(2018, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 			EndAt:        time.Date(2019, time.Month(3), 21, 0, 0, 0, 0, time.UTC),
+// 		})
+// 	}
+// }
 
 func Down1() {
 	// nothing

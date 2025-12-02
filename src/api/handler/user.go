@@ -2,45 +2,21 @@ package handler
 
 import (
 	"fmt"
-	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/CastroEduardo/go-clean-api/api/dto"
 	"github.com/CastroEduardo/go-clean-api/api/helper"
 	"github.com/CastroEduardo/go-clean-api/config"
 	"github.com/CastroEduardo/go-clean-api/constant"
-	"github.com/CastroEduardo/go-clean-api/dependency"
-	service "github.com/CastroEduardo/go-clean-api/services/db"
-	"github.com/CastroEduardo/go-clean-api/usecase"
 	"github.com/gin-gonic/gin"
 )
 
 type UsersHandler struct {
-	userUsecase  *usecase.UserUsecase
-	otpUsecase   *usecase.OtpUsecase
-	tokenUsecase *usecase.TokenUsecase
-	config       *config.Config
-	demo         *usecase.PersianYearUsecase
+	config *config.Config
 }
 
 func NewUserHandler(cfg *config.Config) *UsersHandler {
-	userUsecase := usecase.NewUserUsecase(cfg, dependency.GetUserRepository(cfg))
-	otpUsecase := usecase.NewOtpUsecase(cfg)
-	tokenUsecase := usecase.NewTokenUsecase(cfg)
-	demo := usecase.NewPersianYearUsecase(cfg, dependency.GetPersianYearRepository(cfg))
-	return &UsersHandler{userUsecase: userUsecase, otpUsecase: otpUsecase, tokenUsecase: tokenUsecase, config: cfg, demo: demo}
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
-func randYear(min, max int) int {
-	if max <= min {
-		return min
-	}
-	return rand.Intn(max-min+1) + min
+	return &UsersHandler{config: cfg}
 }
 
 // LoginByUsername godoc
@@ -65,32 +41,34 @@ func (h *UsersHandler) LoginByUsername(c *gin.Context) {
 		return
 	}
 
-	token, err := h.userUsecase.LoginByUsername(c, req.Username, req.Password)
-	if err != nil {
-		c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
-			helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
-		return
-	}
+	token := "TOKEN"
 
-	// go func() {
-	// 	for {
-	// 		// NO necesito pasar db
-	roleService := service.NewRoleService()
+	// token, err := h.userUsecase.LoginByUsername(c, req.Username, req.Password)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
+	// 		helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
+	// 	return
+	// }
 
-	result, _ := roleService.FindAll()
-	fmt.Println("ROLES:", result)
+	// // go func() {
+	// // 	for {
+	// // 		// NO necesito pasar db
+	// roleService := service.NewDbRoleService()
 
-	for _, v := range result {
+	// result, _ := roleService.FindAll()
+	// fmt.Println("ROLES:", result)
 
-		for _, t := range v.Tags {
-			fmt.Println("==> 👍" + t)
-		}
+	// for _, v := range result {
 
-		for _, t := range v.Tags2 {
-			fmt.Println("==> 💯" + t)
-		}
+	// 	for _, t := range v.Tags {
+	// 		fmt.Println("==> 👍" + t)
+	// 	}
 
-	}
+	// 	for _, t := range v.Tags2 {
+	// 		fmt.Println("==> 💯" + t)
+	// 	}
+
+	// }
 	// for _, v := range result {
 	// 	fmt.Println("ROLE:", v.Tags)
 
@@ -139,7 +117,7 @@ func (h *UsersHandler) LoginByUsername(c *gin.Context) {
 	// Set the refresh token in a cookie
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     constant.RefreshTokenCookieName,
-		Value:    token.RefreshToken,
+		Value:    token, //token.RefreshToken,
 		MaxAge:   int(h.config.JWT.RefreshTokenExpireDuration * 60),
 		Path:     "/",
 		Domain:   h.config.Server.Domain,
@@ -194,33 +172,35 @@ func (h *UsersHandler) RegisterByUsername(c *gin.Context) {
 // @Failure 409 {object} helper.BaseHttpResponse "Failed"
 // @Router /v1/users/login-by-mobile [post]
 func (h *UsersHandler) RegisterLoginByMobileNumber(c *gin.Context) {
-	req := new(dto.RegisterLoginByMobileRequest)
-	err := c.ShouldBindJSON(&req)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest,
-			helper.GenerateBaseResponseWithValidationError(nil, false, helper.ValidationError, err))
-		return
-	}
-	token, err := h.userUsecase.RegisterAndLoginByMobileNumber(c, req.MobileNumber, req.Otp)
-	if err != nil {
-		c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
-			helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
-		return
-	}
+	// req := new(dto.RegisterLoginByMobileRequest)
+	// err := c.ShouldBindJSON(&req)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest,
+	// 		helper.GenerateBaseResponseWithValidationError(nil, false, helper.ValidationError, err))
+	// 	return
+	// }
+	// token, err := h.userUsecase.RegisterAndLoginByMobileNumber(c, req.MobileNumber, req.Otp)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
+	// 		helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
+	// 	return
+	// }
 
-	// Set the refresh token in a cookie
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     constant.RefreshTokenCookieName,
-		Value:    token.RefreshToken,
-		MaxAge:   int(h.config.JWT.RefreshTokenExpireDuration * 60),
-		Path:     "/",
-		Domain:   h.config.Server.Domain,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	})
+	// // Set the refresh token in a cookie
+	// http.SetCookie(c.Writer, &http.Cookie{
+	// 	Name:     constant.RefreshTokenCookieName,
+	// 	Value:    token.RefreshToken,
+	// 	MaxAge:   int(h.config.JWT.RefreshTokenExpireDuration * 60),
+	// 	Path:     "/",
+	// 	Domain:   h.config.Server.Domain,
+	// 	Secure:   true,
+	// 	HttpOnly: true,
+	// 	SameSite: http.SameSiteStrictMode,
+	// })
 
-	c.JSON(http.StatusCreated, helper.GenerateBaseResponse(token, true, helper.Success))
+	// c.JSON(http.StatusCreated, helper.GenerateBaseResponse(token, true, helper.Success))
+
+	c.JSON(http.StatusCreated, helper.GenerateBaseResponse("TOKEN", true, helper.Success))
 }
 
 // SendOtp godoc
@@ -235,23 +215,25 @@ func (h *UsersHandler) RegisterLoginByMobileNumber(c *gin.Context) {
 // @Failure 409 {object} helper.BaseHttpResponse "Failed"
 // @Router /v1/users/send-otp [post]
 func (h *UsersHandler) SendOtp(c *gin.Context) {
-	req := new(dto.GetOtpRequest)
-	err := c.ShouldBindJSON(&req)
+	// req := new(dto.GetOtpRequest)
+	// err := c.ShouldBindJSON(&req)
 
-	if err != nil {
+	// if err != nil {
 
-		c.AbortWithStatusJSON(http.StatusBadRequest,
-			helper.GenerateBaseResponseWithValidationError(nil, false, helper.ValidationError, err))
-		return
-	}
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest,
+	// 		helper.GenerateBaseResponseWithValidationError(nil, false, helper.ValidationError, err))
+	// 	return
+	// }
 
-	err = h.otpUsecase.SendOtp(req.MobileNumber)
-	if err != nil {
-		c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
-			helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
-		return
-	}
-	// TODO: Call internal SMS service
+	// err = h.otpUsecase.SendOtp(req.MobileNumber)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
+	// 		helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
+	// 	return
+	// }
+	// // TODO: Call internal SMS service
+	// c.JSON(http.StatusCreated, helper.GenerateBaseResponse(nil, true, helper.Success))
+
 	c.JSON(http.StatusCreated, helper.GenerateBaseResponse(nil, true, helper.Success))
 }
 
@@ -266,22 +248,24 @@ func (h *UsersHandler) SendOtp(c *gin.Context) {
 // @Failure 401 {object} helper.BaseHttpResponse "Failed"
 // @Router /v1/users/refresh-token [post]
 func (h *UsersHandler) RefreshToken(c *gin.Context) {
-	token, err := h.tokenUsecase.RefreshToken(c)
-	if err != nil {
-		c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
-			helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
-		return
-	}
-	// Set the refresh token in a cookie
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     constant.RefreshTokenCookieName,
-		Value:    token.RefreshToken,
-		MaxAge:   int(h.config.JWT.RefreshTokenExpireDuration * 60),
-		Path:     "/",
-		Domain:   h.config.Server.Domain,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	})
-	c.JSON(http.StatusOK, helper.GenerateBaseResponse(token, true, helper.Success))
+	// token, err := h.tokenUsecase.RefreshToken(c)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(helper.TranslateErrorToStatusCode(err),
+	// 		helper.GenerateBaseResponseWithError(nil, false, helper.InternalError, err))
+	// 	return
+	// }
+	// // Set the refresh token in a cookie
+	// http.SetCookie(c.Writer, &http.Cookie{
+	// 	Name:     constant.RefreshTokenCookieName,
+	// 	Value:    token.RefreshToken,
+	// 	MaxAge:   int(h.config.JWT.RefreshTokenExpireDuration * 60),
+	// 	Path:     "/",
+	// 	Domain:   h.config.Server.Domain,
+	// 	Secure:   true,
+	// 	HttpOnly: true,
+	// 	SameSite: http.SameSiteStrictMode,
+	// })
+	//c.JSON(http.StatusOK, helper.GenerateBaseResponse(token, true, helper.Success))
+
+	c.JSON(http.StatusOK, helper.GenerateBaseResponse("TOKEN", true, helper.Success))
 }
